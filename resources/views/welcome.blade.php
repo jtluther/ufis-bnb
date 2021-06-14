@@ -33,6 +33,14 @@
                 padding-top: 5rem;
             }
 
+            .types {
+                margin-bottom: 20px;
+            }
+
+            .links {
+                margin-bottom: 20px;
+            }
+
             .links > a {
                 color: #636b6f;
                 font-size: 13px;
@@ -43,6 +51,11 @@
                 display: block;
                 margin: 5px 0px;
             }
+
+            .links > a span {
+                text-transform: none;
+                letter-spacing: 0;
+            }
         </style>
     </head>
     <body>
@@ -51,10 +64,29 @@
                 <div class="title m-b-md">
                     Welcome to UFIS-BNB!
                 </div>
+                <div class="types">
+                    Filter By
+                    @foreach($types as $type)
+                    <a href="/?type={{ $type->type_id }}">{{ $type->title }}</a>
+                    @endforeach
+                </div>
                 <div class="links">
                     @foreach($properties as $property)
-                    <a href="">{{ $property->title }}</a>
+                        @if( request()->get('type'))
+                            @if( request()->get('type') == $property->type_id )
+                                <a href="/property/{{ $property->property_id }}">{{ $property->title }}</a>
+                            @endif
+                        @else
+                            <a href="/property/{{ $property->property_id }}">{{ $property->title }} - <span>{{ $property->averageRating() }} rating</span></a>
+                        @endif
                     @endforeach
+                </div>
+                <div>
+                    @if( request()->get('sortBy'))
+                        <a href="/">Normal sorting</a>
+                    @else
+                        <a href="/?sortBy=averageRating">Sort by average rating</a>
+                    @endif
                 </div>
             </div>
         </div>

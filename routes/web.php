@@ -1,6 +1,10 @@
 <?php
 
+use Illuminate\Http\Request;
 use App\Property;
+use App\Type;
+use App\Review;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +17,31 @@ use App\Property;
 |
 */
 
-Route::get('/', function () {
+Route::get('/', function (Request $request) {
     $properties = Property::all();
-    return view('welcome')->with('properties', $properties);
+    
+    if ($request->sortBy){
+        $properties = $properties->sortByDesc(function($value, $key) {
+            return $value->averageRating();
+        });
+    }
+
+    $types = Type::all();
+    return view('welcome', ['properties' => $properties, 'types' => $types]);
+});
+
+Route::get('/property/{property}', function (Property $property) {
+    return view('property', ['property' => $property]);
+});
+
+Route::post('/review/{id}', function (Request $request, $id) {
+    $input = $request->all();
+        
+    $review = Review::create([
+        'rating' => $input['rating'],
+        'review' => $input['review'],
+        'property_id' => $id,
+    ]);
+
+    return back()->withInput();
 });
